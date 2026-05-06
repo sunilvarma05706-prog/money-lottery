@@ -1,0 +1,13 @@
+{
+  "name": "money-lottery-v3",
+  "version": "3.0.0",
+  "scripts": {
+    "install:server": "cd server && npm install",
+    "install:client": "cd client && npm install",
+    "install:all": "npm run install:server && npm run install:client",
+    "start:server": "cd server && node index.js",
+    "dev:server": "cd server && npx nodemon index.js",
+    "start:client": "cd client && npm start",
+    "start": "npx concurrently \"npm run start:server\" \"npm run start:client\""
+  }
+}
