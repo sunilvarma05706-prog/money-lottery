@@ -101,17 +101,30 @@ function fmtPostedAt(d){
   return d.toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",
     hour:"2-digit",minute:"2-digit",second:"2-digit"});
 }
+let cachedWb = null;
+let cachedJson = {};
+
+function invalidateCache(sn) {
+  if (sn) delete cachedJson[sn];
+  else cachedJson = {};
+}
+
 function loadWb(){
+  if (cachedWb) return cachedWb;
   try {
-    return fs.existsSync(EXCEL_FILE) ? XLSX.readFile(EXCEL_FILE) : XLSX.utils.book_new();
+    cachedWb = fs.existsSync(EXCEL_FILE) ? XLSX.readFile(EXCEL_FILE) : XLSX.utils.book_new();
+    cachedJson = {};
+    return cachedWb;
   } catch (e) {
     console.error(e);
     throw new Error("Cannot read excel file. Please close if open.");
   }
 }
-function saveWb(wb){ 
+function saveWb(wb, snChanged){ 
   try {
     XLSX.writeFile(wb, EXCEL_FILE); 
+    cachedWb = wb;
+    if (snChanged) invalidateCache(snChanged);
   } catch (e) {
     console.error(e);
     if (e.code === 'EBUSY' || e.message.includes('EBUSY')) {
@@ -130,9 +143,13 @@ function parseDateKey(dk) {
 }
 
 function getYearRows(year){
+  const sn = String(year);
+  if (cachedJson[sn]) return cachedJson[sn];
   const wb = loadWb();
-  if (!wb.SheetNames.includes(String(year))) return [];
-  return XLSX.utils.sheet_to_json(wb.Sheets[String(year)], { defval:"" });
+  if (!wb.SheetNames.includes(sn)) return [];
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { defval:"" });
+  cachedJson[sn] = rows;
+  return rows;
 }
 function getDateRows(year, dateKey){
   return getYearRows(year).filter(r => r["Date"]===dateKey);
@@ -164,7 +181,7 @@ function upsertEntry(year, dateKey, newRow){
   ws["!cols"] = COL_W;
   if (wb.SheetNames.includes(sn)) wb.Sheets[sn]=ws;
   else XLSX.utils.book_append_sheet(wb, ws, sn);
-  saveWb(wb);
+  saveWb(wb, sn);
 }
 
 function deleteEntry(year, dateKey, slotValue){
@@ -173,7 +190,7 @@ function deleteEntry(year, dateKey, slotValue){
   let rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{defval:""});
   rows=rows.filter(r=>!(r["Date"]===dateKey&&r["Time Slot"]===slotValue));
   const ws=XLSX.utils.json_to_sheet(rows,{header:HEADERS});
-  ws["!cols"]=COL_W; wb.Sheets[sn]=ws; saveWb(wb);
+  ws["!cols"]=COL_W; wb.Sheets[sn]=ws; saveWb(wb, sn);
 }
 
 function clearDate(year, dateKey){
@@ -182,7 +199,7 @@ function clearDate(year, dateKey){
   let rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{defval:""});
   rows=rows.filter(r=>r["Date"]!==dateKey);
   const ws=XLSX.utils.json_to_sheet(rows,{header:HEADERS});
-  ws["!cols"]=COL_W; wb.Sheets[sn]=ws; saveWb(wb);
+  ws["!cols"]=COL_W; wb.Sheets[sn]=ws; saveWb(wb, sn);
 }
 
 function getSlotNumber(year, dateKey, slotValue){
