@@ -1,6 +1,5 @@
 {
-<<<<<<< HEAD
-  "name": "money-lottery-v3",
+  "name": "money-lottery-root",
   "version": "3.0.0",
   "scripts": {
     "install:server": "cd server && npm install",
@@ -9,14 +8,9 @@
     "start:server": "cd server && node index.js",
     "dev:server": "cd server && npx nodemon index.js",
     "start:client": "cd client && npm start",
-    "build": "cd client && npm run build"
-=======
-  "name": "money-lottery-server",
-  "version": "3.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon --ignore pending_entries.json --ignore lottery_data.xlsx index.js"
+    "build": "cd client && npm run build",
+    "start": "cd server && node index.js",
+    "dev": "cd server && nodemon --ignore pending_entries.json --ignore lottery_data.xlsx index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -28,6 +22,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
->>>>>>> e6744c3befe7c64565e1fc77defc02140c7e6d35
   }
 }
