@@ -432,9 +432,8 @@ app.delete("/api/today", auth, (req,res)=>{
 
 app.get("/api/admin/today", auth, (req,res)=>{
   const now = new Date(); 
-  const activeD = getActiveDate(now);
-  const dk = getDateKey(activeD); 
-  const yr = getYear(activeD);
+  const dk = getDateKey(now); 
+  const yr = getYear(now);
   let rows=getDateRows(yr,dk); 
   
   const pending = loadPending().filter(r => r["Date"]===dk);
