@@ -59,10 +59,15 @@ setInterval(() => {
     
     if (changed) {
       savePending(newPending);
-      const todayRows = getDateRows(yr,dk);
+      
+      const activeD = getActiveDate(now);
+      const activeDk = getDateKey(activeD);
+      const activeYr = getYear(activeD);
+      
+      const todayRows = getDateRows(activeYr, activeDk);
       const active = getCurrentSlot();
-      const curNum = active ? getSlotNumber(yr,dk,active.value) : null;
-      io.emit("update",{ dateKey:dk, year:yr, activeSlot:active, currentNumber:curNum, rows:todayRows, slotMap:buildSlotMap(todayRows) });
+      const curNum = active ? getSlotNumber(activeYr, activeDk, active.value) : null;
+      io.emit("update",{ dateKey:activeDk, year:activeYr, activeSlot:active, currentNumber:curNum, rows:todayRows, slotMap:buildSlotMap(todayRows) });
     }
   } catch (err) {
     console.error("Interval Error:", err.message);
@@ -81,8 +86,23 @@ function generateTimeSlots() {
   return slots;
 }
 
+// ─── Get active date (Yesterday until 10:04 AM) ────────────────────────────────
+function getActiveDate(d = new Date()) {
+  const currentMinutes = d.getHours() * 60 + d.getMinutes();
+  if (currentMinutes < 10 * 60 + 5) {
+    const yesterday = new Date(d);
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday;
+  }
+  return d;
+}
+
 // ─── Get slots visible up to current time ────────────────────────────────────
 function getVisibleSlots(now = new Date()) {
+  const activeD = getActiveDate(now);
+  if (activeD.getDate() !== now.getDate() || activeD.getMonth() !== now.getMonth()) {
+    return TIME_SLOTS; // All slots visible for yesterday
+  }
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   return TIME_SLOTS.filter(s => {
     const [sh, sm] = s.value.split(":").map(Number);
@@ -210,11 +230,16 @@ function getSlotNumber(year, dateKey, slotValue){
 }
 
 function getCurrentSlot(){
-  const now=new Date(); const total=now.getHours()*60+now.getMinutes();
-  let active=null;
+  const now = new Date();
+  const activeD = getActiveDate(now);
+  if (activeD.getDate() !== now.getDate() || activeD.getMonth() !== now.getMonth()) {
+    return null; // Yesterday is over
+  }
+  const total = now.getHours()*60 + now.getMinutes();
+  let active = null;
   for (const s of TIME_SLOTS){
-    const [sh,sm]=s.value.split(":").map(Number);
-    if (total>=sh*60+sm) active=s; else break;
+    const [sh,sm] = s.value.split(":").map(Number);
+    if (total >= sh*60 + sm) active = s; else break;
   }
   return active;
 }
@@ -243,7 +268,10 @@ app.get("/health", (req, res) => {
 
 // Today live data
 app.get("/api/today", (req,res)=>{
-  const now=new Date(); const dateKey=getDateKey(now); const year=getYear(now);
+  const now = new Date(); 
+  const activeD = getActiveDate(now);
+  const dateKey = getDateKey(activeD); 
+  const year = getYear(activeD);
   const rows=getDateRows(year,dateKey); const active=getCurrentSlot();
   const curNum=active?getSlotNumber(year,dateKey,active.value):null;
   const visibleSlots=getVisibleSlots(now);
@@ -346,10 +374,14 @@ app.post("/api/number", auth, (req,res)=>{
     pending = pending.filter(r => !(r["Date"]===dateKey && r["Time Slot"]===slotValue));
     savePending(pending);
     
-    const todayRows=getDateRows(year,dateKey);
-    const active=getCurrentSlot();
-    const curNum=active?getSlotNumber(year,dateKey,active.value):null;
-    io.emit("update",{ dateKey,year,slotValue,number:validNum,special:newRow["Special"]==="Yes",
+    const activeD = getActiveDate(now);
+    const activeDk = getDateKey(activeD);
+    const activeYr = getYear(activeD);
+    
+    const todayRows = getDateRows(activeYr, activeDk);
+    const active = getCurrentSlot();
+    const curNum = active ? getSlotNumber(activeYr, activeDk, active.value) : null;
+    io.emit("update",{ dateKey:activeDk,year:activeYr,slotValue,number:validNum,special:newRow["Special"]==="Yes",
       activeSlot:active,currentNumber:curNum,rows:todayRows,slotMap:buildSlotMap(todayRows) });
     res.json({ success:true, row:newRow, status:'live' });
   } else {
@@ -369,9 +401,14 @@ app.delete("/api/number/:slot", auth, (req,res)=>{
   pending = pending.filter(r => !(r["Date"]===dk && r["Time Slot"]===req.params.slot));
   savePending(pending);
   
-  const rows=getDateRows(yr,dk); const active=getCurrentSlot();
-  const curNum=active?getSlotNumber(yr,dk,active.value):null;
-  io.emit("update",{dateKey:dk,year:yr,activeSlot:active,currentNumber:curNum,
+  const activeD = getActiveDate(now);
+  const activeDk = getDateKey(activeD);
+  const activeYr = getYear(activeD);
+  
+  const rows = getDateRows(activeYr, activeDk);
+  const active = getCurrentSlot();
+  const curNum = active ? getSlotNumber(activeYr, activeDk, active.value) : null;
+  io.emit("update",{dateKey:activeDk,year:activeYr,activeSlot:active,currentNumber:curNum,
     rows,slotMap:buildSlotMap(rows)});
   res.json({ success:true });
 });
@@ -384,13 +421,20 @@ app.delete("/api/today", auth, (req,res)=>{
   pending = pending.filter(r => r["Date"]!==dk);
   savePending(pending);
 
-  io.emit("update",{dateKey:dk,year:yr,activeSlot:getCurrentSlot(),
+  const activeD = getActiveDate(now);
+  const activeDk = getDateKey(activeD);
+  const activeYr = getYear(activeD);
+
+  io.emit("update",{dateKey:activeDk,year:activeYr,activeSlot:getCurrentSlot(),
     currentNumber:null,rows:[],slotMap:{}});
   res.json({ success:true });
 });
 
 app.get("/api/admin/today", auth, (req,res)=>{
-  const now=new Date(); const dk=getDateKey(now); const yr=getYear(now);
+  const now = new Date(); 
+  const activeD = getActiveDate(now);
+  const dk = getDateKey(activeD); 
+  const yr = getYear(activeD);
   let rows=getDateRows(yr,dk); 
   
   const pending = loadPending().filter(r => r["Date"]===dk);
@@ -419,7 +463,10 @@ app.post("/api/change-password", auth, (req,res)=>{
 //  SOCKET.IO
 // ══════════════════════════════════════════════════════════════════════════════
 io.on("connection", socket=>{
-  const now=new Date(); const dk=getDateKey(now); const yr=getYear(now);
+  const now = new Date(); 
+  const activeD = getActiveDate(now);
+  const dk = getDateKey(activeD); 
+  const yr = getYear(activeD);
   const rows=getDateRows(yr,dk); const active=getCurrentSlot();
   const curNum=active?getSlotNumber(yr,dk,active.value):null;
   const vs=getVisibleSlots(now);
