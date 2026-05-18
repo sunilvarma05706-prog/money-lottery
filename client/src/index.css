@@ -50,13 +50,13 @@ body{
 
 /* ── HERO RESULT ── */
 .result-hero{background:#000;border:2px solid var(--pink);border-radius:2px;text-align:center;padding:10px 8px 14px;margin-bottom:4px;}
-.result-hero .time-label{color:var(--pink2);font-size:.78rem;font-weight:600;margin-bottom:4px;}
+.result-hero .time-label{color:var(--pink2);font-size:.95rem;font-weight:600;margin-bottom:4px;}
 .result-hero .slot-label{font-size:.85rem;color:var(--cyan);margin-bottom:2px;letter-spacing:1px;}
 .result-hero .hindi-title{font-size:2rem;font-weight:700;color:var(--cyan);text-shadow:0 0 14px rgba(0,255,255,.5);line-height:1.2;}
-.result-hero .number-display{font-size:2.4rem;font-weight:800;color:var(--cyan2);font-family:'Rajdhani',monospace;letter-spacing:4px;text-shadow:0 0 20px rgba(0,255,255,.7);margin-top:4px;}
+.result-hero .number-display{font-size:3rem;font-weight:800;color:var(--cyan2);font-family:'Rajdhani',monospace;letter-spacing:4px;text-shadow:0 0 20px rgba(0,255,255,.7);margin-top:4px;}
 .result-hero .number-display .bracket{color:var(--cyan);}
 .result-hero .number-display .arrow{color:var(--yellow);}
-.result-hero .number-display .result-num{color:var(--green);font-size:2.8rem;}
+.result-hero .number-display .result-num{color:var(--green);font-size:3.5rem;}
 
 /* ── INFO BOXES ── */
 .info-box{background:#fff8dc;border:1px solid #aaa;padding:8px 12px;margin:3px 0;font-size:.8rem;color:#222;line-height:1.6;text-align:center;}
@@ -81,24 +81,24 @@ body{
 
 /* ── NUMBER BOX ── */
 .number-box{background:var(--teal-bg);border:1px solid #00aaaa;padding:8px 10px 12px;margin:4px 0;text-align:center;}
-.number-box .nb-label{color:var(--cyan);font-size:.78rem;font-weight:600;margin-bottom:2px;letter-spacing:1px;}
-.number-box .nb-slot{color:#aaa;font-size:.72rem;margin-bottom:4px;}
-.number-box .big-number{font-size:4rem;font-weight:800;color:var(--yellow);font-family:'Rajdhani',monospace;text-shadow:0 0 24px rgba(255,255,0,.7);line-height:1;animation:pulse-num 2s ease-in-out infinite;}
+.number-box .nb-label{color:var(--cyan);font-size:.85rem;font-weight:600;margin-bottom:2px;letter-spacing:1px;}
+.number-box .nb-slot{color:#aaa;font-size:.8rem;margin-bottom:4px;}
+.number-box .big-number{font-size:5rem;font-weight:800;color:var(--yellow);font-family:'Rajdhani',monospace;text-shadow:0 0 24px rgba(255,255,0,.7);line-height:1;animation:pulse-num 2s ease-in-out infinite;}
 @keyframes pulse-num{0%,100%{text-shadow:0 0 24px rgba(255,255,0,.7);}50%{text-shadow:0 0 40px rgba(255,255,0,1),0 0 60px rgba(255,200,0,.5);}}
 .number-box .no-number{color:#555;font-size:.9rem;padding:10px;}
 
 /* ── RESULTS TABLE (public) ── */
 .results-table-wrap{margin:4px 0;overflow-x:auto;}
 .results-table{width:100%;border-collapse:collapse;background:var(--table-bg);}
-.results-table th{background:var(--teal-bg);color:var(--cyan);padding:7px 12px;font-size:.88rem;font-weight:700;text-align:center;border:1px solid #00aaaa;}
-.results-table td{padding:6px 12px;text-align:center;border:1px solid #003333;font-size:.85rem;font-family:'Rajdhani',monospace;font-weight:600;}
+.results-table th{background:var(--teal-bg);color:var(--cyan);padding:7px 12px;font-size:.95rem;font-weight:700;text-align:center;border:1px solid #00aaaa;}
+.results-table td{padding:8px 12px;text-align:center;border:1px solid #003333;font-size:.95rem;font-family:'Rajdhani',monospace;font-weight:600;}
 .results-table tr:nth-child(even) td{background:#001515;}
 .results-table tr:hover td{background:#002222;}
-.results-table .td-time{color:#ccc;}
-.results-table .td-disp{color:#aaa;font-size:.8rem;}
-.results-table .td-num{color:#fff;font-size:1rem;}
+.results-table .td-time{color:#ccc;font-size:.95rem;}
+.results-table .td-disp{color:#aaa;font-size:.95rem;}
+.results-table .td-num{color:#fff;font-size:1.25rem;}
 .results-table .td-num.special{color:var(--cyan);}
-.results-table .td-num.active-row{color:var(--yellow);font-size:1.15rem;}
+.results-table .td-num.active-row{color:var(--yellow);font-size:1.45rem;}
 .results-table .active-row-tr td{background:#002800 !important;border-color:#004400;}
 .results-table .empty-slot{color:#333;font-style:italic;}
 .new-flash td{animation:flash-row 2s ease-out;}

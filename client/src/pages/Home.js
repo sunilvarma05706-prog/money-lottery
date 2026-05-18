@@ -50,6 +50,16 @@ export default function Home() {
   const getVisibleSlots = (allSlots) => {
     const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+    let activeD = new Date(now);
+    if (currentMinutes < 10 * 60 + 5) {
+      activeD.setDate(activeD.getDate() - 1);
+    }
+    
+    if (activeD.getDate() !== now.getDate() || activeD.getMonth() !== now.getMonth()) {
+      return allSlots || [];
+    }
+
     return (allSlots || []).filter((slot) => {
       const [sh, sm] = slot.value.split(":").map(Number);
       return sh * 60 + sm <= currentMinutes;
@@ -133,7 +143,7 @@ export default function Home() {
             </div>
             <div className="logo-icon-box">💰</div>
           </div>
-          <div style={{ color: "#aaa", fontSize: "0.7rem", marginTop: 4 }}>
+          <div style={{ color: "#aaa", fontSize: "0.9rem", marginTop: 4 }}>
             {liveDate}
           </div>
         </div>
