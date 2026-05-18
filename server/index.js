@@ -231,6 +231,11 @@ function auth(req,res,next){
 //  PUBLIC ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
 
+// Root endpoint so base URL doesn't return 404
+app.get("/", (req, res) => {
+  res.status(200).send("Money Lottery Backend is Running!");
+});
+
 // Health Check (used by external monitoring like UptimeRobot to keep server awake)
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
