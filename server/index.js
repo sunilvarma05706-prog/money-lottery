@@ -231,6 +231,11 @@ function auth(req,res,next){
 //  PUBLIC ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
 
+// Health Check (used by external monitoring like UptimeRobot to keep server awake)
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 // Today live data
 app.get("/api/today", (req,res)=>{
   const now=new Date(); const dateKey=getDateKey(now); const year=getYear(now);
